@@ -44,8 +44,7 @@
 │   └── wake.html         侧边栏页面（纯静态，无构建步骤）
 ├── config.example.toml   配置示例（对照用，真实配置由插件自动生成）
 ├── assets/
-│   ├── icon.png          插件图标（512×512，manifest 指向这个）
-│   └── icon.svg          图标源文件，改完重新导出一份 png
+│   └── icon.png          插件图标（512×512，圆角外透明）
 ├── README.md
 ├── LICENSE               MIT
 └── .gitignore            屏蔽 config.toml / state.json / data/
@@ -150,7 +149,7 @@
 | `baresip` + `stdio / aufile / g711 / account / menu` 模块 | 真正发起 SIP 呼叫、播放音频 | 拨不出去，日志报「找不到 baresip」 |
 | `ffmpeg` | 把 TTS 音频转成电话能播的 8k 单声道 WAV | **电话能接通，但一句都听不到** |
 
-**它们不会跟插件一起下载。** 插件的 zip 只有 200 KB，而 ffmpeg 单独就有几十 MB；
+**它们不会跟插件一起下载。** 插件的 zip 只有几百 KB，而 ffmpeg 单独就有几十 MB；
 更重要的是各平台的二进制互不通用，打包进来反而会在别的系统上跑不起来。所以走系统包管理器装。
 
 ### ffmpeg 是干什么的（为什么绕不过去）
