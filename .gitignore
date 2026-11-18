@@ -1,0 +1,19 @@
+# 运行态与个人配置：这些文件永远不该进仓库
+__pycache__/
+*.pyc
+*.pyo
+*.bak*
+*.bak-*
+
+# 真实配置里带 SIP 密码与各家 TTS 密钥
+config.toml
+
+# 插件的运行记录：拨号结果、内网对端缓存、Baresip 完整报文
+state.json
+data/
+*.log
+baresip-*.log
+
+# 本机打包产物
+*.zip
+.DS_Store

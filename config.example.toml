@@ -1,0 +1,107 @@
+# 配置示例，不是运行时要读的那份。
+#
+# 插件首次加载时会自动在 bots/<bot_id>/config/ 下生成 config.toml，
+# 这个文件只是把全部字段和默认值列出来方便对照，可以整段复制过去改。
+# 所有密钥、账号、音色都必须自己填；留空表示「不修改」。
+
+[plugin]
+
+config_version = "1.0.0"
+enabled = true
+
+[wake]
+
+enabled = true
+check_interval_seconds = 20
+max_chars = 60
+llm_task = "replyer"
+use_bot_persona = true
+hour = 8
+minute = 0
+catch_up_minutes = 30
+intent = "现在是早上 {hour}:{minute}，你刚被闹钟弄醒，要去叫主人起床。说一两句叫他起来的话：可以懒洋洋地催、可以嘴硬一下再软，也可以抱怨他怎么还不起。语气像刚睡醒在耳边说话，别用客服腔，别说教。只输出这句话本身，不要解释、不要加引号、不要问他有什么需要帮忙的。"
+
+[[jobs]]
+id = "morning"
+label = "叫起床"
+enabled = true
+hour = 8
+minute = 0
+catch_up_minutes = 30
+max_chars = 60
+intent = "现在是早上 {hour}:{minute}，你准备去叫主人起床。说一两句叫他起来的话：可以懒洋洋地催、可以嘴硬一下再软、可以故意捉弄他，也可以抱怨他怎么还不起。语气像刚睡醒在耳边说话，别用客服腔，别说教。只输出这句话本身，不要解释、不要加引号、不要问他有什么需要帮忙的。"
+llm_task = ""
+
+[persona]
+
+source = "follow"
+text = ""
+first_paragraph_only = true
+initialized = false
+synced_at = ""
+
+[guard]
+
+enabled = true
+max_chars = 80
+ban_words = ""
+fallback_lines = ""
+
+[sip]
+
+enabled = true
+caller_aor = ""
+caller_user = ""
+caller_pass = ""
+server = ""
+# 公网拨号的传输层：留空 = UDP；填 tcp 会带 ;transport=tcp（自建服务器只开 TCP 时用）
+transport = ""
+callee_aor = ""
+baresip_bin = "/usr/bin/baresip"
+module_path = "/usr/lib/baresip/modules"
+ring_seconds = 45
+retry_times = 2
+retry_interval_seconds = 30
+lan_call_enabled = true
+lan_target = ""
+lan_scan_enabled = true
+lan_probe_timeout = 1.2
+lan_fallback_public = true
+lan_subnet_scan = true
+lan_subnet_prefix = 20
+
+[tts]
+
+backend = "edge"
+timeout = 30
+voice = "zh-CN-XiaoyiNeural"
+rate = "+0%"
+api_url = ""
+api_key = ""
+api_model = "tts-v4"
+response_format = "mp3"
+edge_voice = "zh-CN-XiaoyiNeural"
+edge_rate = "+0%"
+openai_url = "https://api.siliconflow.cn/v1/audio/speech"
+openai_key = ""
+openai_model = "tts-1"
+openai_voice = "alloy"
+openai_format = "mp3"
+openai_speed = 1.0
+minimax_url = "https://api.minimaxi.com/v1/t2a_v2"
+minimax_key = ""
+minimax_group_id = ""
+minimax_model = "speech-2.6-turbo"
+minimax_voice = "female-shaonv"
+minimax_format = "mp3"
+minimax_speed = 1.0
+doubao_api = "v3"
+doubao_url = "https://openspeech.bytedance.com/api/v3/tts/unidirectional"
+doubao_app_id = ""
+doubao_token = ""
+doubao_cluster = "volcano_tts"
+doubao_resource_id = "seed-icl-2.0"
+doubao_voice = ""
+doubao_format = "mp3"
+doubao_speed = 1.0
+doubao_sample_rate = 24000

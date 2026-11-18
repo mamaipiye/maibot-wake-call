@@ -1,0 +1,141 @@
+{
+  "schema_version": 2,
+  "required_capabilities": [
+    "custom_pages"
+  ],
+  "workspace_title": "麦麦电话闹钟",
+  "pages": [
+    {
+      "id": "wake-call",
+      "title": "麦麦电话闹钟",
+      "description": "到点打一通 SIP 电话：多个任务各自定时、各自写提示词，可换语音、可改电话里的人设",
+      "placement": "sidebar",
+      "icon": "settings",
+      "mode": "custom",
+      "entry": "webui/wake.html",
+      "layout": "document",
+      "queries": {
+        "status": {
+          "api": "webui_status",
+          "version": "1"
+        }
+      },
+      "actions": {
+        "save": {
+          "api": "webui_save",
+          "version": "1",
+          "parameters": {
+            "wake_enabled": {"type": "boolean", "required": true},
+            "sip_enabled": {"type": "boolean", "required": true},
+            "caller_aor": {"type": "string", "required": true, "max_length": 120},
+            "caller_pass": {"type": "string", "required": false, "max_length": 120},
+            "callee_aor": {"type": "string", "required": true, "max_length": 120},
+            "lan_call_enabled": {"type": "boolean", "required": false},
+            "lan_target": {"type": "string", "required": false, "max_length": 64},
+            "lan_scan_enabled": {"type": "boolean", "required": false},
+            "lan_fallback_public": {"type": "boolean", "required": false},
+            "lan_subnet_scan": {"type": "boolean", "required": false},
+            "lan_subnet_prefix": {"type": "integer", "required": false, "minimum": 0, "maximum": 24},
+            "ring_seconds": {"type": "integer", "required": true, "minimum": 10, "maximum": 180},
+            "retry_times": {"type": "integer", "required": true, "minimum": 0, "maximum": 5},
+            "tts_backend": {"type": "string", "required": false, "choices": ["edge", "openai", "minimax", "doubao"], "max_length": 16},
+            "tts_voice": {"type": "string", "required": false, "max_length": 80},
+            "hour": {"type": "integer", "required": false, "minimum": -1, "maximum": 23},
+            "minute": {"type": "integer", "required": false, "minimum": -1, "maximum": 59}
+          }
+        },
+        "save_jobs": {
+          "api": "webui_save_jobs",
+          "version": "1",
+          "parameters": {
+            "payload": {"type": "string", "required": true, "max_length": 30000}
+          }
+        },
+        "save_tts": {
+          "api": "webui_save_tts",
+          "version": "1",
+          "parameters": {
+            "backend": {"type": "string", "required": false, "choices": ["edge", "openai", "minimax", "doubao"], "max_length": 16},
+            "timeout": {"type": "integer", "required": false, "minimum": 0, "maximum": 120},
+            "edge_voice": {"type": "string", "required": false, "max_length": 80},
+            "edge_rate": {"type": "string", "required": false, "max_length": 12},
+            "openai_url": {"type": "string", "required": false, "max_length": 200},
+            "openai_key": {"type": "string", "required": false, "max_length": 200},
+            "openai_model": {"type": "string", "required": false, "max_length": 80},
+            "openai_voice": {"type": "string", "required": false, "max_length": 80},
+            "minimax_url": {"type": "string", "required": false, "max_length": 200},
+            "minimax_key": {"type": "string", "required": false, "max_length": 200},
+            "minimax_group_id": {"type": "string", "required": false, "max_length": 80},
+            "minimax_model": {"type": "string", "required": false, "max_length": 80},
+            "minimax_voice": {"type": "string", "required": false, "max_length": 80},
+            "doubao_api": {"type": "string", "required": false, "max_length": 16},
+            "doubao_url": {"type": "string", "required": false, "max_length": 200},
+            "doubao_app_id": {"type": "string", "required": false, "max_length": 60},
+            "doubao_token": {"type": "string", "required": false, "max_length": 200},
+            "doubao_cluster": {"type": "string", "required": false, "max_length": 60},
+            "doubao_resource_id": {"type": "string", "required": false, "max_length": 60},
+            "doubao_voice": {"type": "string", "required": false, "max_length": 100}
+          },
+          "confirmation": "确认切换/保存语音合成配置？密钥留空的项会保持原值。"
+        },
+        "save_guard": {
+          "api": "webui_save_guard",
+          "version": "1",
+          "parameters": {
+            "enabled": {"type": "boolean", "required": true},
+            "max_chars": {"type": "integer", "required": true, "minimum": 10, "maximum": 300},
+            "ban_words": {"type": "string", "required": false, "max_length": 6000},
+            "fallback_lines": {"type": "string", "required": false, "max_length": 6000}
+          }
+        },
+        "save_persona": {
+          "api": "webui_save_persona",
+          "version": "1",
+          "parameters": {
+            "source": {"type": "string", "required": false, "choices": ["follow", "custom"], "max_length": 8},
+            "text": {"type": "string", "required": false, "max_length": 8000},
+            "first_paragraph_only": {"type": "boolean", "required": false}
+          }
+        },
+        "persona_import": {
+          "api": "webui_persona_import",
+          "version": "1",
+          "parameters": {
+            "apply": {"type": "boolean", "required": false}
+          },
+          "confirmation": "用 MaiBot 设置里的当前人设覆盖插件里这份人设？改完记得点「保存人设」。"
+        },
+        "persona_restore": {
+          "api": "webui_persona_restore",
+          "version": "1",
+          "confirmation": "把上一次被覆盖掉的那版人设换回来？再点一次可以换回去。"
+        },
+        "tts_preview": {
+          "api": "webui_tts_preview",
+          "version": "1",
+          "parameters": {
+            "backend": {"type": "string", "required": false, "max_length": 16},
+            "text": {"type": "string", "required": false, "max_length": 80}
+          }
+        },
+        "test_call": {
+          "api": "webui_test_call",
+          "version": "1",
+          "parameters": {
+            "use_model": {"type": "boolean", "required": false},
+            "ring_seconds": {"type": "integer", "required": false, "minimum": 10, "maximum": 120},
+            "job_id": {"type": "string", "required": false, "max_length": 16}
+          }
+        },
+        "reset_state": {
+          "api": "webui_reset_state",
+          "version": "1",
+          "parameters": {
+            "job_id": {"type": "string", "required": false, "max_length": 16}
+          },
+          "confirmation": "清空今天已拨过的记录，让定时器今天还能再拨一次？"
+        }
+      }
+    }
+  ]
+}

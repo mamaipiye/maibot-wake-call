@@ -1,0 +1,1535 @@
+<style>
+  .wc-root {
+    --wc-bg: var(--maibot-background, #f9f9f7);
+    --wc-surface: var(--maibot-surface, #ffffff);
+    --wc-fg: var(--maibot-foreground, #0b0b0b);
+    --wc-muted: var(--maibot-muted, #6e6d68);
+    --wc-soft: var(--maibot-soft, #f1f0ec);
+    --wc-border: var(--maibot-border, rgba(11, 11, 11, 0.10));
+    --wc-primary: var(--maibot-primary, #2a78d6);
+    --wc-primary-fg: var(--maibot-primary-foreground, #ffffff);
+    --wc-good: #0ca30c;
+    --wc-warn: #c98500;
+    --wc-bad: #d03b3b;
+    --wc-radius: var(--maibot-radius, 12px);
+    font-family: var(--maibot-font-body, system-ui, -apple-system, "Segoe UI", "Microsoft YaHei UI", sans-serif);
+    color: var(--wc-fg);
+    padding: 20px 22px 48px;
+    max-width: 880px;
+    margin: 0 auto;
+    box-sizing: border-box;
+  }
+  html.dark .wc-root, :root.dark .wc-root {
+    --wc-bg: var(--maibot-background, #0d0d0d);
+    --wc-surface: var(--maibot-surface, #1a1a19);
+    --wc-fg: var(--maibot-foreground, #f0efec);
+    --wc-muted: var(--maibot-muted, #9a9890);
+    --wc-soft: var(--maibot-soft, #252523);
+    --wc-border: var(--maibot-border, rgba(255, 255, 255, 0.10));
+    --wc-good: #3ec63e;
+    --wc-warn: #e0a52a;
+    --wc-bad: #e66767;
+  }
+  .wc-root *, .wc-root *::before, .wc-root *::after { box-sizing: border-box; }
+
+  .wc-head { display: flex; align-items: flex-start; justify-content: space-between; gap: 16px; margin-bottom: 18px; }
+  .wc-title { font-size: 19px; font-weight: 650; margin: 0 0 4px; letter-spacing: -0.01em; }
+  .wc-sub { font-size: 12.5px; color: var(--wc-muted); margin: 0; line-height: 1.5; }
+
+  .wc-stats { display: grid; grid-template-columns: repeat(auto-fit, minmax(150px, 1fr)); gap: 10px; margin-bottom: 16px; }
+  .wc-stat { background: var(--wc-surface); border: 1px solid var(--wc-border); border-radius: var(--wc-radius); padding: 12px 14px; }
+  .wc-stat-label { font-size: 11px; color: var(--wc-muted); letter-spacing: 0.02em; margin-bottom: 6px; }
+  .wc-stat-value { font-size: 14.5px; font-weight: 600; font-variant-numeric: tabular-nums; word-break: break-all; }
+  .wc-ok { color: var(--wc-good); }
+  .wc-warn { color: var(--wc-warn); }
+  .wc-bad { color: var(--wc-bad); }
+
+  .wc-card { background: var(--wc-surface); border: 1px solid var(--wc-border); border-radius: var(--wc-radius); padding: 16px 18px; margin-bottom: 14px; }
+  .wc-card-title { font-size: 13px; font-weight: 650; margin: 0 0 12px; color: var(--wc-fg); }
+  .wc-card-title span { font-weight: 400; color: var(--wc-muted); margin-left: 8px; font-size: 12px; }
+
+  .wc-row { display: grid; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); gap: 12px 14px; }
+  .wc-field { display: flex; flex-direction: column; gap: 5px; min-width: 0; }
+  .wc-field label { font-size: 12px; color: var(--wc-muted); }
+  .wc-field input[type="text"], .wc-field input[type="password"], .wc-field input[type="number"], .wc-field select {
+    width: 100%; padding: 8px 10px; font-size: 13px; font-family: inherit;
+    color: var(--wc-fg); background: var(--wc-bg);
+    border: 1px solid var(--wc-border); border-radius: 8px; outline: none;
+  }
+  .wc-field input:focus, .wc-field select:focus { border-color: var(--wc-primary); }
+  .wc-hint { font-size: 11px; color: var(--wc-muted); line-height: 1.45; }
+
+  .wc-toggle { display: flex; align-items: center; gap: 9px; padding: 9px 0; }
+  .wc-toggle input { width: 16px; height: 16px; accent-color: var(--wc-primary); cursor: pointer; }
+  .wc-toggle label { font-size: 13px; cursor: pointer; }
+  .wc-toggle small { color: var(--wc-muted); font-size: 11.5px; }
+
+  .wc-actions { display: flex; flex-wrap: wrap; gap: 10px; align-items: center; }
+  .wc-btn {
+    appearance: none; border: 1px solid var(--wc-border); background: var(--wc-surface);
+    color: var(--wc-fg); padding: 9px 16px; font-size: 13px; font-family: inherit;
+    border-radius: 8px; cursor: pointer; transition: opacity .15s, background .15s;
+  }
+  .wc-btn:hover { background: var(--wc-soft); }
+  .wc-btn:disabled { opacity: .5; cursor: not-allowed; }
+  .wc-btn-primary { background: var(--wc-primary); border-color: var(--wc-primary); color: var(--wc-primary-fg); font-weight: 600; }
+  .wc-btn-primary:hover { background: var(--wc-primary); opacity: .9; }
+
+  .wc-banner { margin-top: 12px; padding: 10px 13px; border-radius: 8px; font-size: 12.5px; line-height: 1.55; display: none; }
+  .wc-banner.show { display: block; }
+  .wc-banner.info { background: var(--wc-soft); color: var(--wc-fg); }
+  .wc-banner.good { background: rgba(12, 163, 12, .12); color: var(--wc-good); }
+  .wc-banner.bad { background: rgba(208, 59, 59, .12); color: var(--wc-bad); }
+  .wc-banner code { font-family: ui-monospace, Consolas, monospace; font-size: 12px; }
+  .wc-logtip { display: inline-block; margin-top: 4px; opacity: .8; word-break: break-all; }
+
+  .wc-last { margin-top: 12px; font-size: 12.5px; color: var(--wc-muted); line-height: 1.6; }
+  .wc-last b { color: var(--wc-fg); font-weight: 600; }
+  .wc-note { font-size: 11.5px; color: var(--wc-muted); line-height: 1.6; margin: 10px 0 0; }
+
+  /* 语音后端：切换面板、预设、试听 */
+  .wc-chips { display: flex; flex-wrap: wrap; gap: 8px; margin-bottom: 14px; }
+  .wc-chip {
+    appearance: none; font-size: 12px; font-family: inherit; padding: 6px 12px;
+    border-radius: 999px; border: 1px solid var(--wc-border);
+    background: var(--wc-bg); color: var(--wc-fg); cursor: pointer;
+  }
+  .wc-chip:hover { border-color: var(--wc-primary); color: var(--wc-primary); }
+  .wc-subpanel { display: none; margin-top: 14px; padding-top: 14px; border-top: 1px dashed var(--wc-border); }
+  .wc-subpanel.on { display: block; }
+  .wc-subpanel > .wc-hint { margin-top: 10px; }
+  .wc-field[data-v1only] { display: none; }
+  .wc-field[data-v1only].show { display: flex; }
+  .wc-tag {
+    display: inline-block; font-size: 11px; padding: 1px 7px; margin-left: 6px;
+    border-radius: 999px; background: var(--wc-soft); color: var(--wc-muted);
+  }
+  .wc-tag.ok { background: rgba(12, 163, 12, .14); color: var(--wc-good); }
+  .wc-tag.warn { background: rgba(201, 133, 0, .16); color: var(--wc-warn); }
+  .wc-audio { display: none; width: 100%; margin-top: 12px; }
+  .wc-audio.show { display: block; }
+
+  /* 语音人设 */
+  .wc-chip.on {
+    border-color: var(--wc-primary); color: var(--wc-primary);
+    background: rgba(42, 120, 214, .10); font-weight: 600;
+  }
+  .wc-textarea {
+    width: 100%; min-height: 150px; padding: 10px 12px;
+    font-size: 12.5px; line-height: 1.65; font-family: inherit;
+    color: var(--wc-fg); background: var(--wc-bg);
+    border: 1px solid var(--wc-border); border-radius: 8px;
+    outline: none; resize: vertical;
+  }
+  .wc-textarea:focus { border-color: var(--wc-primary); }
+  .wc-toggle input:disabled + label { opacity: .5; cursor: not-allowed; }
+  .wc-pre {
+    display: none; margin: 12px 0 0; padding: 10px 12px;
+    max-height: 280px; overflow: auto; background: var(--wc-soft);
+    border-radius: 8px; font-size: 12px; line-height: 1.6;
+    white-space: pre-wrap; word-break: break-word; color: var(--wc-fg);
+    font-family: inherit;
+  }
+  .wc-pre.show { display: block; }
+  .wc-card.flash { border-color: var(--wc-primary); box-shadow: 0 0 0 3px rgba(42, 120, 214, .16); }
+
+  /* 折叠抽屉：设置项太多，除了核心几张卡，其余默认收起，点标题展开 */
+  .wc-card.wc-fold { padding: 13px 16px; }
+  .wc-card.wc-fold > .wc-card-title {
+    margin: 0; display: flex; align-items: center; gap: 9px;
+    cursor: pointer; user-select: none; -webkit-tap-highlight-color: transparent;
+  }
+  .wc-card.wc-fold > .wc-card-title::before {
+    content: ""; flex: none; width: 0; height: 0;
+    border-left: 5px solid var(--wc-muted);
+    border-top: 4px solid transparent; border-bottom: 4px solid transparent;
+    transition: transform .16s ease; transform-origin: 30% 50%;
+  }
+  .wc-card.wc-fold.open > .wc-card-title::before { transform: rotate(90deg); }
+  .wc-card.wc-fold.open > .wc-card-title { margin-bottom: 12px; }
+  .wc-card.wc-fold > .wc-card-title span {
+    min-width: 0; overflow: hidden; text-overflow: ellipsis; white-space: nowrap;
+  }
+  .wc-card.wc-fold:not(.open) > *:not(.wc-card-title) { display: none; }
+  .wc-card.wc-fold:not(.open):hover > .wc-card-title { color: var(--wc-primary); }
+
+  /* 定时任务列表 */
+  .wc-job {
+    border: 1px solid var(--wc-border); border-radius: 10px;
+    padding: 10px 12px; margin-bottom: 10px; background: var(--wc-bg);
+  }
+  .wc-job.just-fired { border-color: rgba(42, 120, 214, .45); }
+  .wc-job-top { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+  .wc-job-top input[type="checkbox"] {
+    width: 16px; height: 16px; flex: none;
+    accent-color: var(--wc-primary); cursor: pointer;
+  }
+  .j-label {
+    flex: 1 1 120px; min-width: 90px; padding: 6px 9px;
+    font-size: 13px; font-family: inherit; font-weight: 600;
+    color: var(--wc-fg); background: var(--wc-surface);
+    border: 1px solid var(--wc-border); border-radius: 7px; outline: none;
+  }
+  .j-time { display: flex; align-items: center; gap: 3px; font-size: 13px; color: var(--wc-muted); flex: none; }
+  .j-time input {
+    width: 54px; padding: 6px 4px; text-align: center;
+    font-size: 13px; font-family: inherit; font-variant-numeric: tabular-nums;
+    color: var(--wc-fg); background: var(--wc-surface);
+    border: 1px solid var(--wc-border); border-radius: 7px; outline: none;
+  }
+  .j-label:focus, .j-time input:focus { border-color: var(--wc-primary); }
+  .j-tools { display: flex; gap: 6px; flex: none; margin-left: auto; }
+  .wc-btn-sm { padding: 5px 10px; font-size: 12px; border-radius: 7px; }
+  .wc-btn-danger { color: var(--wc-bad); }
+  .wc-job-meta { font-size: 11.5px; color: var(--wc-muted); margin-top: 7px; line-height: 1.55; }
+  .wc-job-meta b { color: var(--wc-fg); font-weight: 600; }
+  .wc-job-more { display: none; margin-top: 10px; padding-top: 10px; border-top: 1px dashed var(--wc-border); }
+  .wc-job-more.on { display: block; }
+  .wc-job-more .cap { display: block; font-size: 12px; color: var(--wc-muted); margin-bottom: 5px; }
+  .j-intent {
+    width: 100%; min-height: 92px; padding: 8px 10px; resize: vertical;
+    font-size: 12.5px; line-height: 1.65; font-family: inherit;
+    color: var(--wc-fg); background: var(--wc-surface);
+    border: 1px solid var(--wc-border); border-radius: 7px; outline: none;
+  }
+  .j-intent:focus { border-color: var(--wc-primary); }
+  .wc-job-more .wc-row { margin-top: 10px; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr)); }
+  .wc-job-more .wc-field input {
+    width: 100%; padding: 6px 9px; font-size: 12.5px; font-family: inherit;
+    color: var(--wc-fg); background: var(--wc-surface);
+    border: 1px solid var(--wc-border); border-radius: 7px; outline: none;
+  }
+  .wc-empty { font-size: 12.5px; color: var(--wc-muted); padding: 14px 0; text-align: center; }
+</style>
+
+<div class="wc-root" id="wc-root">
+  <div class="wc-head">
+    <div>
+      <h2 class="wc-title">麦麦电话闹钟</h2>
+      <p class="wc-sub">到点打一通 SIP 电话到你手机，接起来就是她说话。可以放多个任务，各自定时、各自写提示词。</p>
+    </div>
+    <div class="wc-actions">
+      <button class="wc-btn" id="wc-fold-all" type="button">全部展开</button>
+      <button class="wc-btn" id="wc-goto-persona" type="button">人设</button>
+      <button class="wc-btn" id="wc-refresh" type="button">刷新</button>
+    </div>
+  </div>
+
+  <div class="wc-stats">
+    <div class="wc-stat">
+      <div class="wc-stat-label">下次拨打</div>
+      <div class="wc-stat-value" id="st-next">--</div>
+    </div>
+    <div class="wc-stat">
+      <div class="wc-stat-label">定时器</div>
+      <div class="wc-stat-value" id="st-timer">--</div>
+    </div>
+    <div class="wc-stat">
+      <div class="wc-stat-label">账号 / 环境</div>
+      <div class="wc-stat-value" id="st-env">--</div>
+    </div>
+    <div class="wc-stat">
+      <div class="wc-stat-label">今日已拨</div>
+      <div class="wc-stat-value" id="st-attempts">--</div>
+    </div>
+  </div>
+
+  <div class="wc-card wc-fold open" id="card-jobs">
+    <h3 class="wc-card-title">定时任务 <span>一个任务一通电话，时间与提示词互不影响</span></h3>
+    <div id="jobs-list"></div>
+    <div class="wc-actions" style="margin-top:12px">
+      <button class="wc-btn" id="wc-add-job" type="button">+ 新增任务</button>
+      <button class="wc-btn wc-btn-primary" id="wc-save-jobs" type="button">保存任务</button>
+      <div class="wc-toggle" style="padding:0">
+        <input type="checkbox" id="f-wake">
+        <label for="f-wake">总开关 <small>关掉就所有任务都不拨</small></label>
+      </div>
+      <span class="wc-hint" id="jobs-hint"></span>
+    </div>
+    <p class="wc-note">
+      提示词里可以用 <code>{hour}</code>、<code>{minute}</code>、<code>{label}</code> 占位符。
+      每个任务给的提示词不同，说出来的内容就不同——不一定非得叫起床，提醒吃饭、催睡觉、到点报时都行。
+    </p>
+  </div>
+
+  <div class="wc-card wc-fold" id="card-persona">
+    <h3 class="wc-card-title">语音人设 <span>只决定这通电话里她是谁，不动 MaiBot 本体</span></h3>
+
+    <div class="wc-chips">
+      <button class="wc-chip" type="button" data-pmode="follow">跟随 MaiBot 设置</button>
+      <button class="wc-chip" type="button" data-pmode="custom">用插件内人设（独立）</button>
+    </div>
+
+    <div class="wc-toggle">
+      <input type="checkbox" id="f-persona-first">
+      <label for="f-persona-first">跟随模式下只取第一段 <small>后面常是大段关系设定，打电话用不上还烧 token；切到独立人设后这项自动失效</small></label>
+    </div>
+
+    <div class="wc-field" style="margin-top:6px">
+      <label for="f-persona">插件内人设（可写全文） <span id="persona-len"></span></label>
+      <textarea id="f-persona" class="wc-textarea" spellcheck="false" placeholder="首次启用插件时会自动把 MaiBot 的人设全文抓一份到这里。也可以直接重写一份只给打电话用的。"></textarea>
+    </div>
+
+    <div class="wc-hint" id="persona-state" style="margin-top:8px"></div>
+
+    <div class="wc-actions" style="margin-top:12px">
+      <button class="wc-btn wc-btn-primary" id="wc-save-persona" type="button">保存人设</button>
+      <button class="wc-btn" id="wc-import-persona" type="button">从设置再导入一份</button>
+      <button class="wc-btn" id="wc-restore-persona" type="button">恢复上一版</button>
+      <button class="wc-btn" id="wc-show-effective" type="button">看实际生效的内容</button>
+    </div>
+    <pre class="wc-pre" id="persona-effective"></pre>
+    <p class="wc-note">
+      两条路互不影响：改这里不会写回 MaiBot 的设置，改设置里那份也不会覆盖这里。
+      选「跟随」就每次现读设置（可以用第一段），选「插件内」就只用上面这份全文。
+    </p>
+  </div>
+
+  <div class="wc-card wc-fold" id="card-sip">
+    <h3 class="wc-card-title">SIP 账号 <span>Linphone 免费账号，两个不同账号</span></h3>
+    <div class="wc-row">
+      <div class="wc-field">
+        <label for="f-caller">主叫（MaiBot 自己的号）</label>
+        <input type="text" id="f-caller" placeholder="sip:bot@sip.linphone.org" autocomplete="off">
+      </div>
+      <div class="wc-field">
+        <label for="f-callee">被叫（你手机上的号）</label>
+        <input type="text" id="f-callee" placeholder="sip:me@sip.linphone.org" autocomplete="off">
+      </div>
+      <div class="wc-field">
+        <label for="f-pass">主叫密码 <span id="pass-state"></span></label>
+        <input type="password" id="f-pass" placeholder="留空表示不修改" autocomplete="new-password">
+        <div class="wc-hint">密码只写进插件本地 config.toml，页面不回显。</div>
+      </div>
+    </div>
+    <div class="wc-toggle">
+      <input type="checkbox" id="f-sip">
+      <label for="f-sip">真的拨号 <small>关掉等于只生成台词，用来调试</small></label>
+    </div>
+    <div class="wc-toggle">
+      <input type="checkbox" id="f-lan">
+      <label for="f-lan">同一局域网时走内网直呼 <small>媒体不出局域网，不绕海外服务器</small></label>
+    </div>
+    <div class="wc-hint">部署在云服务器上请关掉这一项。</div>
+    <div class="wc-hint">云端自建 SIP：服务器地址填在 config.toml 的 server 里，同机填 127.0.0.1，跨机填 IP:端口（如 1.2.3.4:5080）；要走 TCP 再加一行 transport = "tcp"。</div>
+    <div class="wc-row">
+      <div class="wc-field">
+        <label for="f-lan-target">内网直呼目标 <span id="lan-local"></span></label>
+        <input type="text" id="f-lan-target" placeholder="留空 = 自动找；也可填 10.0.0.5 或 10.0.0.5:52038" autocomplete="off">
+        <div class="wc-hint">填要接电话那台的局域网 IP。留空时先问上次学到的地址，不应答就自动扫临时端口段把它找回来；再找不到才走公网。</div>
+        <div class="wc-hint wc-warn" id="lan-miss"></div>
+      </div>
+    </div>
+    <div class="wc-toggle">
+      <input type="checkbox" id="f-lan-scan">
+      <label for="f-lan-scan">端口失效时自动扫描找回 <small>Linphone 的 SIP 端口是系统随机分的，重启就变</small></label>
+    </div>
+    <div class="wc-toggle">
+      <input type="checkbox" id="f-lan-subnet">
+      <label for="f-lan-subnet">对方换了 IP 也自动找回 <small>拿记住的端口扫一遍本机所在网段，几秒钟</small></label>
+    </div>
+    <div class="wc-row" id="lan-subnet-row">
+      <div class="wc-field">
+        <label for="f-lan-prefix">找回范围</label>
+        <select id="f-lan-prefix">
+          <option value="24">/24 最收敛（254 个地址，约 1 秒）</option>
+          <option value="20">/20 推荐（4094 个地址，约 9 秒）</option>
+        </select>
+        <div class="wc-hint">校园网这类按大网段分池的环境用 /20；家里 /24 就够。对每个地址只发一个 SIP 问询包，不响铃、不建立通话。</div>
+      </div>
+    </div>
+    <div class="wc-toggle">
+      <input type="checkbox" id="f-lan-fallback">
+      <label for="f-lan-fallback">内网没接通就自动回退公网 <small>建议保持开启</small></label>
+    </div>
+    <div class="wc-actions">
+      <button class="wc-btn wc-btn-primary" id="wc-save" type="button">保存账号设置</button>
+    </div>
+    <div class="wc-hint">这一下会把主叫 / 被叫、内网直呼开关，以及「通话」卡片里的响铃时长和重拨次数一起存盘。</div>
+  </div>
+
+  <div class="wc-card wc-fold" id="card-call">
+    <h3 class="wc-card-title">通话 <span>响铃与重拨</span></h3>
+    <div class="wc-row">
+      <div class="wc-field">
+        <label for="f-ring">单次通话时长（秒）</label>
+        <input type="number" id="f-ring" min="10" max="180" step="5">
+      </div>
+      <div class="wc-field">
+        <label for="f-retry">没接通重拨次数</label>
+        <input type="number" id="f-retry" min="0" max="5" step="1">
+      </div>
+    </div>
+  </div>
+
+  <div class="wc-card wc-fold" id="card-guard">
+    <h3 class="wc-card-title">台词守门 <span>模型抽风时，不让报错被念出来</span></h3>
+
+    <div class="wc-toggle">
+      <input type="checkbox" id="f-guard">
+      <label for="f-guard">启用守门 <small>命中禁用词就改用备用台词；合成前还会强制截断超长文本</small></label>
+    </div>
+
+    <div class="wc-row">
+      <div class="wc-field">
+        <label for="f-guard-chars">合成前字数上限</label>
+        <input type="number" id="f-guard-chars" min="10" max="300" step="5">
+      </div>
+      <div class="wc-field">
+        <label>当前生效 <span id="guard-count"></span></label>
+        <div class="wc-hint" id="guard-state"></div>
+      </div>
+    </div>
+
+    <div class="wc-field" style="margin-top:10px">
+      <label for="f-guard-ban">禁用词 <span id="ban-count"></span></label>
+      <textarea id="f-guard-ban" class="wc-textarea" style="min-height:104px" spellcheck="false"
+        placeholder="每行一个，也可以用逗号分隔。留空 = 使用内置默认词表（限流、额度、鉴权、AI 拒答这类只有报错时才会出现的词）。"></textarea>
+    </div>
+    <div class="wc-actions" style="margin-top:8px">
+      <button class="wc-btn" id="wc-fill-ban" type="button">填入内置词表</button>
+      <button class="wc-btn" id="wc-clear-ban" type="button">清空（回到内置）</button>
+    </div>
+
+    <div class="wc-field" style="margin-top:12px">
+      <label for="f-guard-pool">备用台词 <span id="pool-count"></span></label>
+      <textarea id="f-guard-pool" class="wc-textarea" style="min-height:104px" spellcheck="false"
+        placeholder="每行一句。留空 = 使用内置的十句备用台词，随机挑一句且尽量不重复。"></textarea>
+    </div>
+    <div class="wc-actions" style="margin-top:8px">
+      <button class="wc-btn" id="wc-fill-pool" type="button">填入内置台词</button>
+      <button class="wc-btn wc-btn-primary" id="wc-save-guard" type="button">保存守门设置</button>
+    </div>
+
+    <p class="wc-note">
+      为什么要这两道闸：模型抽风时会返回一大段英文的限流说明，或者「作为 AI 我无法…」。
+      这段话是按字数计费的（豆包按字数扣额度），原样送进语音合成就是白烧钱，念出来还是一通莫名其妙的电话。
+      判断只看「只在报错时才会出现的词」，不看中文还是英文——想让她说外语也不会被误杀。
+      字数上限是真保险丝：不管模型返回多长，送进合成前一律截到这个长度以内。
+    </p>
+  </div>
+
+  <div class="wc-card wc-fold" id="card-tts">
+    <h3 class="wc-card-title">语音合成 <span>决定她用哪个声音说话</span></h3>
+
+    <div class="wc-chips">
+      <button class="wc-chip" type="button" data-preset="edge">Edge · 免费</button>
+      <button class="wc-chip" type="button" data-preset="openai">OpenAI 兼容</button>
+      <button class="wc-chip" type="button" data-preset="minimax">MiniMax</button>
+      <button class="wc-chip" type="button" data-preset="doubao">豆包 / 火山</button>
+    </div>
+
+    <div class="wc-row">
+      <div class="wc-field">
+        <label for="f-backend">当前启用</label>
+        <select id="f-backend">
+          <option value="edge">Edge（免费，无需密钥）</option>
+          <option value="openai">OpenAI 兼容 /v1/audio/speech</option>
+          <option value="minimax">MiniMax T2A</option>
+          <option value="doubao">豆包 / 火山引擎</option>
+        </select>
+      </div>
+      <div class="wc-field">
+        <label for="f-tts-timeout">合成超时（秒）</label>
+        <input type="number" id="f-tts-timeout" min="5" max="120" step="5">
+      </div>
+    </div>
+
+    <div class="wc-subpanel" data-panel="edge">
+      <div class="wc-row">
+        <div class="wc-field">
+          <label for="f-edge-voice">音色</label>
+          <input type="text" id="f-edge-voice" placeholder="zh-CN-XiaoyiNeural" autocomplete="off">
+        </div>
+        <div class="wc-field">
+          <label for="f-edge-rate">语速</label>
+          <input type="text" id="f-edge-rate" placeholder="+0%" autocomplete="off">
+        </div>
+      </div>
+      <div class="wc-hint">常用音色：zh-CN-XiaoyiNeural、zh-CN-XiaoxiaoNeural、zh-CN-liaoning-XiaobeiNeural。语速写 +10% / -10%，留空等于不变。</div>
+    </div>
+
+    <div class="wc-subpanel" data-panel="openai">
+      <div class="wc-row">
+        <div class="wc-field">
+          <label for="f-openai-url">接口地址</label>
+          <input type="text" id="f-openai-url" placeholder="https://api.siliconflow.cn/v1/audio/speech" autocomplete="off">
+        </div>
+        <div class="wc-field">
+          <label for="f-openai-key">API Key <span id="openai-key-state"></span></label>
+          <input type="password" id="f-openai-key" placeholder="留空表示不修改" autocomplete="new-password">
+        </div>
+        <div class="wc-field">
+          <label for="f-openai-model">model</label>
+          <input type="text" id="f-openai-model" placeholder="tts-1" autocomplete="off">
+        </div>
+        <div class="wc-field">
+          <label for="f-openai-voice">voice</label>
+          <input type="text" id="f-openai-voice" placeholder="alloy" autocomplete="off">
+        </div>
+      </div>
+      <div class="wc-hint">只要服务端兼容 <code>POST /v1/audio/speech</code> 就能用：OpenAI、硅基流动、阿里百炼兼容模式、自建 GPT-SoVITS 网关都算。</div>
+    </div>
+
+    <div class="wc-subpanel" data-panel="minimax">
+      <div class="wc-row">
+        <div class="wc-field">
+          <label for="f-minimax-url">接口地址</label>
+          <input type="text" id="f-minimax-url" placeholder="https://api.minimaxi.com/v1/t2a_v2" autocomplete="off">
+        </div>
+        <div class="wc-field">
+          <label for="f-minimax-key">API Key <span id="minimax-key-state"></span></label>
+          <input type="password" id="f-minimax-key" placeholder="留空表示不修改" autocomplete="new-password">
+        </div>
+        <div class="wc-field">
+          <label for="f-minimax-group">GroupId</label>
+          <input type="text" id="f-minimax-group" placeholder="可留空" autocomplete="off">
+        </div>
+        <div class="wc-field">
+          <label for="f-minimax-model">model</label>
+          <input type="text" id="f-minimax-model" placeholder="speech-2.6-turbo" autocomplete="off">
+        </div>
+        <div class="wc-field">
+          <label for="f-minimax-voice">voice_id</label>
+          <input type="text" id="f-minimax-voice" placeholder="female-shaonv" autocomplete="off">
+        </div>
+      </div>
+      <div class="wc-hint">国内站用 api.minimaxi.com，海外站用 api.minimax.io；返回的音频是 hex，插件会自动解码。</div>
+    </div>
+
+    <div class="wc-subpanel" data-panel="doubao">
+      <div class="wc-row">
+        <div class="wc-field">
+          <label for="f-doubao-url">接口地址</label>
+          <input type="text" id="f-doubao-url" placeholder="https://openspeech.bytedance.com/api/v3/tts/unidirectional" autocomplete="off">
+        </div>
+        <div class="wc-field">
+          <label for="f-doubao-token">API Key <span id="doubao-token-state"></span></label>
+          <input type="password" id="f-doubao-token" placeholder="控制台「API Key 管理」里那串；留空表示不修改" autocomplete="new-password">
+        </div>
+        <div class="wc-field">
+          <label for="f-doubao-voice">音色 speaker</label>
+          <input type="text" id="f-doubao-voice" placeholder="zh_female_shuangkuaisisi_moon_bigtts" autocomplete="off">
+        </div>
+        <div class="wc-field">
+          <label for="f-doubao-resource">Resource-Id</label>
+          <input type="text" id="f-doubao-resource" placeholder="普通音色 seed-tts-2.0；复刻音色 seed-icl-2.0" autocomplete="off">
+        </div>
+      </div>
+      <div class="wc-hint">新版控制台只认一个 <b>API Key</b>，没有 AppID 这一项了，所以这里只留一个密钥框。用复刻音色时 Resource-Id 要改成 <b>seed-icl-2.0</b>（对应账单是「声音复刻 2.0」），再用复刻出来的音色 ID 填上面的 speaker。</div>
+    </div>
+
+    <div class="wc-actions" style="margin-top:14px">
+      <button class="wc-btn wc-btn-primary" id="wc-save-tts" type="button">保存语音配置</button>
+      <button class="wc-btn" id="wc-preview" type="button">试听一句</button>
+      <span class="wc-hint" id="tts-last"></span>
+    </div>
+    <audio id="wc-audio" class="wc-audio" controls></audio>
+    <p class="wc-note">
+      试听会真的调用一次接口、真实计费（一句十几个字，一般几厘钱），然后按电话链路转成 8kHz 单声道播放——
+      听到的就是接线后手机里的效果。
+    </p>
+  </div>
+
+  <div class="wc-card wc-fold open" id="card-ops">
+    <h3 class="wc-card-title">操作 <span>先用「试拨」把链路跑通，再看定时</span></h3>
+    <div class="wc-actions">
+      <button class="wc-btn wc-btn-primary" id="wc-test" type="button">试拨一次</button>
+      <button class="wc-btn" id="wc-reset" type="button">清空今日记录</button>
+    </div>
+    <div class="wc-toggle">
+      <input type="checkbox" id="f-usemodel">
+      <label for="f-usemodel">试拨时用任务的提示词生成台词 <small>不勾就拨固定台词「喂，测试一下，能听见我说话吗？」，只验链路通不通</small></label>
+    </div>
+    <div class="wc-banner" id="wc-banner"></div>
+    <div class="wc-last" id="wc-last"></div>
+    <p class="wc-note">
+      每个任务卡片上的「试拨」会真的拨出去，手机响 30 秒，接起来能听到声音才算通。
+      拨号用的是 baresip，走 UDP 5060，不需要梯子。
+    </p>
+  </div>
+</div>
+
+<script>
+(function () {
+  const $ = (id) => document.getElementById(id);
+  const banner = $('wc-banner');
+
+  // ── 折叠抽屉：设置项太多，除核心卡片外默认收起，点标题展开 ──
+  const FOLD_KEY = 'wc-fold-open-v1';
+  const FOLD_CARDS = Array.prototype.slice.call(document.querySelectorAll('.wc-card.wc-fold'));
+  let foldState = {};
+  try { foldState = JSON.parse(localStorage.getItem(FOLD_KEY) || '{}') || {}; } catch (e) { foldState = {}; }
+
+  function saveFold() {
+    try { localStorage.setItem(FOLD_KEY, JSON.stringify(foldState)); } catch (e) {}
+  }
+  function expandCard(card) {
+    if (!card || !card.classList || !card.classList.contains('wc-fold')) return;
+    card.classList.add('open');
+    if (card.id) { foldState[card.id] = true; saveFold(); }
+    syncFoldAllLabel();
+  }
+  function collapseCard(card) {
+    if (!card || !card.classList) return;
+    card.classList.remove('open');
+    if (card.id) { foldState[card.id] = false; saveFold(); }
+    syncFoldAllLabel();
+  }
+  function syncFoldAllLabel() {
+    const btn = $('wc-fold-all');
+    if (!btn || !FOLD_CARDS.length) return;
+    const allOpen = FOLD_CARDS.every((c) => c.classList.contains('open'));
+    btn.textContent = allOpen ? '全部收起' : '全部展开';
+  }
+
+  FOLD_CARDS.forEach((card) => {
+    // 有记忆就按记忆来，没记忆就留 HTML 里写的默认状态
+    if (card.id && Object.prototype.hasOwnProperty.call(foldState, card.id)) {
+      card.classList.toggle('open', !!foldState[card.id]);
+    }
+    const title = card.querySelector('.wc-card-title');
+    if (!title) return;
+    title.addEventListener('click', () => {
+      if (card.classList.contains('open')) collapseCard(card);
+      else expandCard(card);
+    });
+  });
+
+  (function initFoldAll() {
+    const btn = $('wc-fold-all');
+    if (!btn) return;
+    btn.addEventListener('click', () => {
+      const allOpen = FOLD_CARDS.every((c) => c.classList.contains('open'));
+      FOLD_CARDS.forEach((c) => { if (allOpen) collapseCard(c); else expandCard(c); });
+      syncFoldAllLabel();
+    });
+    syncFoldAllLabel();
+  })();
+
+  function show(kind, html) {
+    banner.className = 'wc-banner show ' + kind;
+    banner.innerHTML = html;
+    // 横幅住在「操作」卡里，卡片收起时提示会看不见 → 任何提示都先把那张卡摊开
+    expandCard(banner.closest('.wc-card'));
+  }
+
+  // 兜底：任何没被 catch 的脚本错误都显示到顶部横幅上。
+  // 之前有个校验错误抛在 try 外面，表现就是「按钮点了完全没反应」，很难查。
+  window.addEventListener('error', (e) => {
+    const msg = e && e.message ? e.message : '未知脚本错误';
+    if (banner) show('bad', '页面脚本出错：' + esc(msg));
+  });
+  window.addEventListener('unhandledrejection', (e) => {
+    const r = e && e.reason;
+    const msg = r && r.message ? r.message : String(r || '未知错误');
+    if (banner) show('bad', '操作没有发出去：' + esc(msg));
+  });
+
+  async function query(name, params) {
+    const res = await window.maibot.query(name, params || {});
+    if (res && res.success === false) throw new Error(res.error || '查询失败');
+    return (res && res.data !== undefined) ? res.data : res;
+  }
+  async function action(name, params) {
+    const res = await window.maibot.action(name, params || {});
+    if (res && res.success === false) throw new Error(res.error || '操作失败');
+    return (res && res.data !== undefined) ? res.data : res;
+  }
+
+  function fmtNext(iso) {
+    if (!iso) return '--';
+    const m = String(iso).match(/^(\d{4})-(\d{2})-(\d{2})T(\d{2}):(\d{2})/);
+    if (!m) return String(iso);
+    const today = new Date();
+    const sameDay = m[1] === String(today.getFullYear())
+      && m[2] === String(today.getMonth() + 1).padStart(2, '0')
+      && m[3] === String(today.getDate()).padStart(2, '0');
+    return sameDay ? ('今天 ' + m[4] + ':' + m[5]) : (m[2] + '-' + m[3] + ' ' + m[4] + ':' + m[5]);
+  }
+
+  const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;' };
+  function esc(value) {
+    return String(value == null ? '' : value).replace(/[&<>"]/g, (ch) => map[ch]);
+  }
+
+  // 异常文本要转义再进横幅：它可能带着接口返回的原始片段，
+  // 直接塞 innerHTML 等于把对端返回的内容当 HTML 执行。
+  function errText(err) {
+    const raw = err && err.message ? err.message : String(err);
+    return esc(raw);
+  }
+
+  // 每次拨号的 SIP 报文都落盘了，失败时把路径直接摊在横幅上，省得再去翻日志。
+  function logTip(res) {
+    const path = res && res.log ? String(res.log) : '';
+    if (!path) return '';
+    return '<br><span class="wc-logtip">完整报文：<code>' + esc(path) + '</code></span>';
+  }
+
+  // 单块渲染隔离：出错只影响自己，不让整页跟着白屏。
+  function safe(label, fn) {
+    try { fn(); } catch (err) { console.warn('[wake] ' + label + ' 渲染失败', err); }
+  }
+
+  function render(s) {
+    const next = $('st-next');
+    if (!s.wake_enabled) {
+      next.textContent = '未开启';
+      next.className = 'wc-stat-value wc-warn';
+    } else if (!s.next_at) {
+      next.textContent = '没有启用的任务';
+      next.className = 'wc-stat-value wc-warn';
+    } else {
+      next.textContent = fmtNext(s.next_at) + (s.next_job ? ' · ' + s.next_job : '');
+      next.className = 'wc-stat-value';
+    }
+
+    const timer = $('st-timer');
+    if (!s.wake_enabled) { timer.textContent = '待用'; timer.className = 'wc-stat-value wc-warn'; }
+    else if (s.ticking) {
+      timer.textContent = (s.jobs_enabled || 0) + ' / ' + (s.job_count || 0) + ' 个任务';
+      timer.className = 'wc-stat-value wc-ok';
+    } else { timer.textContent = '没在跑'; timer.className = 'wc-stat-value wc-bad'; }
+
+    const env = $('st-env');
+    // 用 === false 而不是 !s.ffmpeg_ok：旧版后端不返回这个字段，
+    // 用取反会把「不知道」误报成「缺失」。
+    if (!s.baresip_ok) { env.textContent = 'baresip 缺失'; env.className = 'wc-stat-value wc-bad'; }
+    else if (s.ffmpeg_ok === false) { env.textContent = 'ffmpeg 缺失'; env.className = 'wc-stat-value wc-bad'; }
+    else if (!s.account_ready) { env.textContent = '账号未填全'; env.className = 'wc-stat-value wc-warn'; }
+    else { env.textContent = '就绪'; env.className = 'wc-stat-value wc-ok'; }
+
+    $('st-attempts').textContent = String(s.attempts_today || 0) + ' 次';
+    $('pass-state').textContent = s.caller_pass_set ? '（已设置）' : '（未设置）';
+
+    if (document.activeElement !== $('f-caller')) $('f-caller').value = s.caller_aor || '';
+    if (document.activeElement !== $('f-callee')) $('f-callee').value = s.callee_aor || '';
+    if (document.activeElement !== $('f-ring')) $('f-ring').value = s.ring_seconds;
+    if (document.activeElement !== $('f-retry')) $('f-retry').value = s.retry_times;
+    $('f-wake').checked = !!s.wake_enabled;
+    $('f-sip').checked = !!s.sip_enabled;
+    $('f-lan').checked = !!s.lan_call_enabled;
+    $('f-lan-scan').checked = s.lan_scan_enabled !== false;
+    $('f-lan-subnet').checked = s.lan_subnet_scan !== false;
+    $('f-lan-fallback').checked = s.lan_fallback_public !== false;
+    if (document.activeElement !== $('f-lan-prefix')) $('f-lan-prefix').value = String(s.lan_subnet_prefix || 20);
+    $('lan-subnet-row').style.display = $('f-lan-subnet').checked ? '' : 'none';
+    if (document.activeElement !== $('f-lan-target')) $('f-lan-target').value = s.lan_target || '';
+    $('lan-local').textContent = s.local_ip ? '（本机 ' + s.local_ip + '）' : '';
+    // 上次没找到内网对端时，把原因和下一步写在输入框下面：
+    // 只显示「没找到」的话，分不清是没扫（撞冷却）还是扫了没人应答，
+    // 也就不知道该不该手填一次 IP。
+    const miss = s.lan_miss || {};
+    $('lan-miss').innerHTML = miss.reason
+      ? esc((miss.ts ? miss.ts.replace('T', ' ') + '　' : '') + miss.reason) +
+        '　→ 在这个框里手填一次对方的 IP（端口可留空），这段地址会被记住，下次优先扫。'
+      : '';
+    // 每块单独兜异常：某一块的数据异常时，只该它自己停在旧值，
+    // 不能把后面几块的渲染一起带走（之前 status 里一个字段报错，整页就空了）。
+    safe('语音合成', () => renderTts(s.tts || {}));
+    safe('台词守门', () => renderGuard(s.guard || {}));
+    safe('人设', () => renderPersona(s.persona || {}));
+    safe('任务列表', () => renderJobs(s.jobs || []));
+
+    const fired = (s.jobs || [])
+      .filter((job) => job.last_fired_at)
+      .sort((a, b) => (a.last_fired_at < b.last_fired_at ? 1 : -1));
+    const parts = [];
+    if (fired.length) {
+      const job = fired[0];
+      parts.push('最近 <b>' + esc(job.label || job.id) + '</b> ' + esc(job.last_fired_at.replace('T', ' ')));
+      if (job.last_text) parts.push('台词 <b>' + esc(job.last_text) + '</b>');
+      if (job.last_result) parts.push('结果 <b>' + esc(job.last_result) + '</b>');
+    }
+    if (s.last_test_at) parts.push('上次试拨 <b>' + esc(s.last_test_at.replace('T', ' ')) + '</b>');
+    $('wc-last').innerHTML = parts.length ? parts.join('　·　') : '还没有拨打记录。';
+  }
+
+  async function refresh() {
+    try {
+      const s = await query('status');
+      render(s);
+    } catch (err) {
+      show('bad', '读取状态失败：' + errText(err));
+    }
+  }
+
+  function collect() {
+    const ring = parseInt($('f-ring').value, 10);
+    const retry = parseInt($('f-retry').value, 10);
+    if (!Number.isInteger(ring) || ring < 10 || ring > 180) throw new Error('通话时长要填 10-180 秒');
+    if (!Number.isInteger(retry) || retry < 0 || retry > 5) throw new Error('重拨次数要填 0-5');
+
+    return {
+      wake_enabled: $('f-wake').checked,
+      sip_enabled: $('f-sip').checked,
+      caller_aor: $('f-caller').value.trim(),
+      caller_pass: $('f-pass').value,
+      callee_aor: $('f-callee').value.trim(),
+      lan_call_enabled: $('f-lan').checked,
+      lan_target: $('f-lan-target').value.trim(),
+      lan_scan_enabled: $('f-lan-scan').checked,
+      lan_subnet_scan: $('f-lan-subnet').checked,
+      lan_subnet_prefix: parseInt($('f-lan-prefix').value, 10) || 20,
+      lan_fallback_public: $('f-lan-fallback').checked,
+      ring_seconds: ring,
+      retry_times: retry,
+      // 主保存按钮也要带上当前选中的语音后端，否则后端会被默认值覆盖回 edge。
+      tts_backend: $('f-backend').value,
+    };
+  }
+
+  // ── 定时任务列表 ──
+  let JOBS = [];
+
+  function jobMeta(job) {
+    const bits = [];
+    if (!job.enabled) bits.push('<span class="wc-warn">已停用</span>');
+    else if (job.next_at) bits.push('下次 <b>' + esc(fmtNext(job.next_at)) + '</b>');
+    if (job.fired_today) bits.push('今天已拨');
+    else if (job.attempts_today) bits.push('今日试过 ' + job.attempts_today + ' 次');
+    if (job.last_text) bits.push('上次说：<b>' + esc(job.last_text) + '</b>');
+    else if (job.last_error) bits.push('<span class="wc-bad">' + esc(job.last_error) + '</span>');
+    if (job.last_guard) bits.push('<span class="wc-warn">守门：' + esc(job.last_guard) + '</span>');
+    return bits.join('　·　') || '还没跑过';
+  }
+
+  function jobHtml(job) {
+    const hour = job.hour == null ? 8 : job.hour;
+    const minute = job.minute == null ? 0 : job.minute;
+    const catchUp = job.catch_up_minutes == null ? 30 : job.catch_up_minutes;
+    const maxChars = job.max_chars == null ? 60 : job.max_chars;
+    const intent = job.intent || job.default_intent || '';
+    return ''
+      + '<div class="wc-job' + (job.fired_today ? ' just-fired' : '') + '" data-id="' + esc(job.id) + '">'
+      + '  <div class="wc-job-top">'
+      + '    <input type="checkbox" class="j-enabled"' + (job.enabled ? ' checked' : '') + ' title="启用 / 停用这个任务">'
+      + '    <input type="text" class="j-label" maxlength="20" value="' + esc(job.label) + '" placeholder="任务名">'
+      + '    <div class="j-time">'
+      + '      <input type="number" class="j-hour" min="0" max="23" step="1" value="' + hour + '">'
+      + '      <span>:</span>'
+      + '      <input type="number" class="j-minute" min="0" max="59" step="1" value="' + String(minute).padStart(2, '0') + '">'
+      + '    </div>'
+      + '    <div class="j-tools">'
+      + '      <button class="wc-btn wc-btn-sm" type="button" data-act="more">提示词</button>'
+      + '      <button class="wc-btn wc-btn-sm" type="button" data-act="test">试拨</button>'
+      + '      <button class="wc-btn wc-btn-sm wc-btn-danger" type="button" data-act="del">删除</button>'
+      + '    </div>'
+      + '  </div>'
+      + '  <div class="wc-job-meta">' + jobMeta(job) + '</div>'
+      + '  <div class="wc-job-more">'
+      + '    <label class="cap">这个任务要她说什么 —— 模型按这段生成台词，{hour} / {minute} / {label} 会被替换</label>'
+      + '    <textarea class="j-intent" spellcheck="false" placeholder="比如：现在是中午 {hour}:{minute}，叫他去吃饭，别老坐着。">' + esc(intent) + '</textarea>'
+      + '    <div class="wc-row">'
+      + '      <div class="wc-field"><label>错过补打（分钟）</label>'
+      + '        <input type="number" class="j-catch" min="0" max="720" step="5" value="' + catchUp + '"></div>'
+      + '      <div class="wc-field"><label>台词字数上限</label>'
+      + '        <input type="number" class="j-maxchars" min="10" max="200" step="5" value="' + maxChars + '"></div>'
+      + '      <div class="wc-field"><label>模型任务（留空用全局）</label>'
+      + '        <input type="text" class="j-llmtask" maxlength="40" value="' + esc(job.llm_task || '') + '" placeholder="replyer"></div>'
+      + '    </div>'
+      + '  </div>'
+      + '</div>';
+  }
+
+  function renderJobs(list) {
+    JOBS = Array.isArray(list) ? list : [];
+    const box = $('jobs-list');
+    if (!JOBS.length) {
+      box.innerHTML = '<div class="wc-empty">还没有任务，点下面「+ 新增任务」建一个。</div>';
+      return;
+    }
+    box.innerHTML = JOBS.map(jobHtml).join('');
+  }
+
+  function collectJobs() {
+    const nodes = [].slice.call(document.querySelectorAll('#jobs-list .wc-job'));
+    if (!nodes.length) throw new Error('至少要留一个任务；不想让它响就关掉那个任务的开关');
+    return nodes.map((el, index) => {
+      const hour = parseInt(el.querySelector('.j-hour').value, 10);
+      const minute = parseInt(el.querySelector('.j-minute').value, 10);
+      if (!Number.isInteger(hour) || hour < 0 || hour > 23) throw new Error('第 ' + (index + 1) + ' 个任务的小时要填 0-23');
+      if (!Number.isInteger(minute) || minute < 0 || minute > 59) throw new Error('第 ' + (index + 1) + ' 个任务的分钟要填 0-59');
+      const catchUp = parseInt(el.querySelector('.j-catch').value, 10);
+      const maxChars = parseInt(el.querySelector('.j-maxchars').value, 10);
+      return {
+        id: el.dataset.id || '',
+        label: el.querySelector('.j-label').value.trim() || ('任务' + (index + 1)),
+        enabled: el.querySelector('.j-enabled').checked,
+        hour: hour,
+        minute: minute,
+        catch_up_minutes: Number.isInteger(catchUp) ? catchUp : 30,
+        max_chars: Number.isInteger(maxChars) ? maxChars : 60,
+        intent: el.querySelector('.j-intent').value.trim(),
+        llm_task: el.querySelector('.j-llmtask').value.trim(),
+      };
+    });
+  }
+
+  async function saveJobs(btn) {
+    let list;
+    try {
+      list = collectJobs();
+    } catch (err) {
+      show('bad', esc(err.message));
+      return;
+    }
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '保存中…';
+    try {
+      const res = await action('save_jobs', { payload: JSON.stringify(list) });
+      $('jobs-hint').textContent = '';
+      show('good', '任务已保存，共 <b>' + ((res && res.count) || list.length) + '</b> 个。下次拨打 <b>'
+        + esc(res && res.next_at ? res.next_at.replace('T', ' ') : '—') + '</b>');
+      await refresh();
+    } catch (err) {
+      show('bad', '保存失败：' + errText(err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  }
+
+  function addJob() {
+    let list;
+    try {
+      list = collectJobs();
+    } catch (err) {
+      show('bad', esc(err.message));
+      return;
+    }
+    const base = JOBS[0] || {};
+    list.push({
+      id: 'job' + Date.now().toString(36),
+      label: '新任务',
+      enabled: true,
+      hour: 12,
+      minute: 0,
+      catch_up_minutes: 30,
+      max_chars: base.max_chars == null ? 60 : base.max_chars,
+      intent: '',
+      llm_task: '',
+      default_intent: base.default_intent || '',
+    });
+    renderJobs(list);
+    const rows = document.querySelectorAll('#jobs-list .wc-job');
+    const last = rows[rows.length - 1];
+    if (last) {
+      last.querySelector('.wc-job-more').classList.add('on');
+      last.querySelector('[data-act="more"]').textContent = '收起';
+      last.querySelector('.j-label').focus();
+      last.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    }
+    show('info', '加了一个新任务，改好时间和提示词后点「保存任务」。');
+  }
+
+  function removeJob(el) {
+    el.remove();
+    if (!document.querySelectorAll('#jobs-list .wc-job').length) {
+      $('jobs-list').innerHTML = '<div class="wc-empty">还没有任务，点下面「+ 新增任务」建一个。</div>';
+    }
+    $('jobs-hint').textContent = '已删掉一行，点「保存任务」才真正生效。';
+  }
+
+  async function testJob(el, btn) {
+    let list;
+    try {
+      list = collectJobs();
+    } catch (err) {
+      show('bad', esc(err.message));
+      return;
+    }
+    let jobId = el.dataset.id || '';
+    const rowIndex = [].slice.call(document.querySelectorAll('#jobs-list .wc-job')).indexOf(el);
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '准备中…';
+    try {
+      // 先落盘，否则后端用的还是上一次保存的提示词。
+      const saved = await action('save_jobs', { payload: JSON.stringify(list) });
+      // 新任务/重复 id 会被后端重新分配 id，得用落盘后那一份去试拨，
+      // 否则 test_call 找不到任务，只会反复报「得先带上任务」。
+      const after = (saved && saved.jobs) || [];
+      if (rowIndex >= 0 && after[rowIndex] && after[rowIndex].id) {
+        jobId = after[rowIndex].id;
+        el.dataset.id = jobId;
+      }
+      btn.textContent = '拨打中…';
+      show('info', '正在按这个任务的提示词生成台词并拨号，手机大概会响 30 秒，接起来能听到声音才算通…');
+      const res = await action('test_call', { use_model: true, ring_seconds: 30, job_id: jobId });
+      if (res && res.ok) {
+        show('good', '拨通了' + (res.text ? '：<b>' + esc(res.text) + '</b>' : '') + logTip(res));
+      } else {
+        show('bad', '没接通：' + esc((res && res.error) || '未知原因') + ((res && res.hint) ? '<br>' + esc(res.hint) : '') + logTip(res));
+      }
+      await refresh();
+    } catch (err) {
+      show('bad', '试拨失败：' + errText(err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  }
+
+  $('jobs-list').addEventListener('click', (e) => {
+    const btn = e.target.closest('button[data-act]');
+    if (!btn) return;
+    const row = btn.closest('.wc-job');
+    if (!row) return;
+    const act = btn.dataset.act;
+    if (act === 'more') {
+      const more = row.querySelector('.wc-job-more');
+      more.classList.toggle('on');
+      btn.textContent = more.classList.contains('on') ? '收起' : '提示词';
+    } else if (act === 'test') {
+      testJob(row, btn);
+    } else if (act === 'del') {
+      removeJob(row);
+    }
+  });
+  $('wc-add-job').addEventListener('click', addJob);
+  $('wc-save-jobs').addEventListener('click', (e) => saveJobs(e.currentTarget));
+
+  // ── 语音人设：跟随 / 独立 / 导入 / 看生效内容 ──
+  let PERSONA = { source: 'follow' };
+
+  function updatePersonaLen() {
+    const len = $('f-persona').value.trim().length;
+    $('persona-len').textContent = '（' + len + ' 字）';
+  }
+
+  function paintPersona() {
+    const source = (PERSONA.source || 'follow');
+    document.querySelectorAll('[data-pmode]').forEach((b) => {
+      b.classList.toggle('on', b.dataset.pmode === source);
+    });
+    const firstBox = $('f-persona-first');
+    firstBox.checked = !!PERSONA.first_paragraph_only;
+    firstBox.disabled = source === 'custom';
+    updatePersonaLen();
+
+    const nowLen = $('f-persona').value.trim().length;
+    const bits = [];
+    if (source === 'custom') {
+      bits.push('当前用<b>插件内人设</b>（' + nowLen + ' 字，全量注入），和设置里那份已经脱钩。');
+    } else if (PERSONA.bot_available) {
+      bits.push('当前<b>跟随 MaiBot 设置</b>：原文 ' + PERSONA.bot_len + ' 字，'
+        + (PERSONA.first_paragraph_only ? '只取第一段' : '全文') + '注入。');
+      if (PERSONA.text_len) bits.push('插件内快照 ' + PERSONA.text_len + ' 字，当前不生效。');
+    } else {
+      bits.push('当前<b>跟随 MaiBot 设置</b>，但那边还没读到人设，只会用「时间与台词」里的 intent 提示词。');
+    }
+    if (PERSONA.effective_len) bits.push('上次读到实际注入 <b>' + PERSONA.effective_len + '</b> 字，保存后按新的来。');
+    else bits.push('<span class="wc-warn">上次读到不会注入任何人设。</span>');
+    if (source === 'follow' && $('f-persona').value.trim() !== (PERSONA.text || '').trim()) {
+      bits.push('<span class="wc-warn">框里内容改过了，保存时会自动切成「插件内人设」。</span>');
+    }
+    if (PERSONA.prev_len) {
+      bits.push('可恢复上一版（' + PERSONA.prev_len + ' 字，'
+        + String(PERSONA.prev_at || '').replace('T', ' ') + '）');
+    }
+    $('persona-state').innerHTML = bits.join('　');
+    $('persona-effective').classList.remove('show');
+    $('wc-show-effective').textContent = '看实际生效的内容';
+  }
+
+  function renderPersona(p) {
+    PERSONA = p || {};
+    const ta = $('f-persona');
+    if (document.activeElement !== ta) ta.value = PERSONA.text || '';
+    paintPersona();
+  }
+
+  async function savePersona(btn) {
+    const text = $('f-persona').value;
+    let source = PERSONA.source || 'follow';
+    let auto = false;
+    // 改了文本还挂在「跟随」下是说不通的：设置里那份一改就把改动盖掉了，所以自动切成独立。
+    if (source === 'follow' && text.trim() !== (PERSONA.text || '').trim()) {
+      source = 'custom';
+      auto = true;
+    }
+    if (source === 'custom' && !text.trim()) {
+      show('bad', '插件内人设是空的。要么写点东西，要么把来源切回「跟随 MaiBot 设置」。');
+      return;
+    }
+    // 人设是手写内容，改短了没法从别处找回：掉一半以上先问一句。
+    const before = (PERSONA.text || '').trim().length;
+    if (before >= 120 && text.trim().length < before * 0.6) {
+      const ok = window.confirm(
+        '人设从 ' + before + ' 字变成 ' + text.trim().length + ' 字，少了 ' 
+        + (before - text.trim().length) + ' 字。\n\n确定要保存吗？（存完还能点「恢复上一版」换回来）'
+      );
+      if (!ok) return;
+    }
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '保存中…';
+    try {
+      const res = await action('save_persona', {
+        source: source,
+        text: text,
+        first_paragraph_only: $('f-persona-first').checked
+      });
+      PERSONA.source = source;
+      const eff = (res && res.persona && res.persona.effective_len) || 0;
+      show('good', '人设已保存。'
+        + (auto ? '因为改了文本，来源自动切成<b>插件内人设</b>，之后改设置里的也不会影响这里。' : '')
+        + '明早这通电话按它说话，实际注入 <b>' + eff + '</b> 字。');
+      await refresh();
+    } catch (err) {
+      show('bad', '保存失败：' + errText(err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  }
+
+  async function importPersona(btn) {
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '导入中…';
+    try {
+      const res = await action('persona_import', { apply: true });
+      if (!res || res.ok === false) {
+        show('bad', esc((res && res.error) || '没读到 MaiBot 的人设'));
+        return;
+      }
+      show('good', '已把 MaiBot 设置里的人设 <b>' + res.bot_len + '</b> 字导入上面的框（还没保存）。');
+      await refresh();
+    } catch (err) {
+      show('bad', '导入失败：' + errText(err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  }
+
+  async function restorePersona(btn) {
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '恢复中…';
+    try {
+      const res = await action('persona_restore', {});
+      show('good', '已恢复上一版人设（<b>' + ((res && res.len) || 0) + '</b> 字）。再点一次可以换回去。');
+      await refresh();
+    } catch (err) {
+      show('bad', '恢复失败：' + errText(err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  }
+
+  function toggleEffective(btn) {
+    const pre = $('persona-effective');
+    if (pre.classList.contains('show')) {
+      pre.classList.remove('show');
+      btn.textContent = '看实际生效的内容';
+      return;
+    }
+    const eff = (PERSONA.effective || '').trim();
+    pre.textContent = eff
+      ? '【来源：' + (PERSONA.effective_note || PERSONA.source || '?') + ' · ' + eff.length + ' 字 · 上限 ' + (PERSONA.limit || '') + '】\n\n' + eff
+      : '（这一次不会注入任何人设，只会用「时间与台词」里的 intent 提示词）';
+    pre.classList.add('show');
+    btn.textContent = '收起';
+  }
+
+  function gotoPersona() {
+    const card = $('card-persona');
+    if (!card) return;
+    expandCard(card);
+    card.scrollIntoView({ behavior: 'smooth', block: 'start' });
+    card.classList.add('flash');
+    setTimeout(() => card.classList.remove('flash'), 1400);
+  }
+
+  // ── 语音合成：后端切换 / 预设 / 保存 / 试听 ──
+  const TTS_NAMES = { edge: 'Edge', openai: 'OpenAI 兼容', minimax: 'MiniMax', doubao: '豆包' };
+  const TTS_PRESETS = {
+    edge: { backend: 'edge' },
+    openai: {
+      backend: 'openai',
+      url: 'https://api.siliconflow.cn/v1/audio/speech',
+      model: 'FunAudioLLM/CosyVoice2-0.5B',
+      voice: 'anna'
+    },
+    minimax: {
+      backend: 'minimax',
+      url: 'https://api.minimaxi.com/v1/t2a_v2',
+      model: 'speech-2.6-turbo',
+      voice: 'female-shaonv'
+    },
+    doubao: {
+      backend: 'doubao',
+      api: 'v3',
+      url: 'https://openspeech.bytedance.com/api/v3/tts/unidirectional',
+      voice: 'zh_female_shuangkuaisisi_moon_bigtts',
+      resource: 'seed-tts-2.0'
+    }
+  };
+
+  function switchPanel(backend) {
+    document.querySelectorAll('.wc-subpanel').forEach((el) => {
+      el.classList.toggle('on', el.dataset.panel === backend);
+    });
+  }
+
+  function setTag(id, ok) {
+    const el = $(id);
+    if (!el) return;
+    el.textContent = ok ? '已设置' : '未设置';
+    el.className = 'wc-tag ' + (ok ? 'ok' : 'warn');
+  }
+
+  // ── 台词守门 ──
+  let GUARD = {};
+
+  function renderGuard(g) {
+    GUARD = g || {};
+    const on = g.enabled !== false;
+    $('f-guard').checked = on;
+    if (document.activeElement !== $('f-guard-chars')) $('f-guard-chars').value = g.max_chars || 80;
+    if (document.activeElement !== $('f-guard-ban')) $('f-guard-ban').value = g.ban_words || '';
+    if (document.activeElement !== $('f-guard-pool')) $('f-guard-pool').value = g.fallback_lines || '';
+    // 输入框显式置灰：关掉守门时下面这些填了也不生效，得让人一眼看出来。
+    ['f-guard-chars', 'f-guard-ban', 'f-guard-pool'].forEach((id) => { $(id).disabled = !on; });
+    ['wc-fill-ban', 'wc-clear-ban', 'wc-fill-pool'].forEach((id) => { $(id).disabled = !on; });
+
+    const words = g.ban_words_count || 0;
+    const lines = g.fallback_count || 0;
+    $('guard-count').textContent = on ? '' : '（已关闭）';
+    $('ban-count').textContent = g.ban_words_custom ? '（自定义 ' + words + ' 个）' : '（内置 ' + words + ' 个）';
+    $('pool-count').textContent = g.fallback_custom ? '（自定义 ' + lines + ' 句）' : '（内置 ' + lines + ' 句）';
+    $('guard-state').innerHTML = !on
+      ? '守门已关，模型返回什么就念什么。'
+      : (g.ban_words_custom
+        ? '用你自己填的词表；命中后改说备用台词，最长 ' + (g.max_chars || 80) + ' 字。'
+        : '用内置词表；命中后改说备用台词，最长 ' + (g.max_chars || 80) + ' 字。');
+  }
+
+  async function saveGuard(btn) {
+    const chars = parseInt($('f-guard-chars').value, 10);
+    if (!Number.isInteger(chars) || chars < 10 || chars > 300) {
+      show('bad', '合成前字数上限要填 10-300');
+      return;
+    }
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '保存中…';
+    try {
+      const res = await action('save_guard', {
+        enabled: $('f-guard').checked,
+        max_chars: chars,
+        ban_words: $('f-guard-ban').value,
+        fallback_lines: $('f-guard-pool').value,
+      });
+      const g = (res && res.guard) || {};
+      renderGuard(g);
+      show('good', g.enabled
+        ? '守门设置已保存：命中禁用词改说备用台词，合成前最多 <b>' + (g.max_chars || chars) + '</b> 字。'
+        : '守门<b>已关闭</b>，模型返回什么就念什么（仍按任务自己的字数上限截断）。');
+      await refresh();
+    } catch (err) {
+      show('bad', '保存失败：' + errText(err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  }
+
+  function renderTts(t) {
+    if (document.activeElement !== $('f-backend')) $('f-backend').value = t.backend || 'edge';
+    if (document.activeElement !== $('f-tts-timeout')) $('f-tts-timeout').value = t.timeout || 30;
+    const set = (id, v) => {
+      const el = $(id);
+      if (el && document.activeElement !== el) el.value = (v === null || v === undefined) ? '' : v;
+    };
+    set('f-edge-voice', t.edge_voice);
+    set('f-edge-rate', t.edge_rate);
+    set('f-openai-url', t.openai_url);
+    set('f-openai-model', t.openai_model);
+    set('f-openai-voice', t.openai_voice);
+    set('f-minimax-url', t.minimax_url);
+    set('f-minimax-group', t.minimax_group_id);
+    set('f-minimax-model', t.minimax_model);
+    set('f-minimax-voice', t.minimax_voice);
+    set('f-doubao-url', t.doubao_url);
+    set('f-doubao-voice', t.doubao_voice);
+    set('f-doubao-resource', t.doubao_resource_id);
+    set('f-doubao-cluster', t.doubao_cluster);
+    setTag('openai-key-state', t.openai_key_set);
+    setTag('minimax-key-state', t.minimax_key_set);
+    setTag('doubao-token-state', t.doubao_token_set);
+    $('tts-last').textContent = t.last_preview ? ('上次试听：' + t.last_preview) : '';
+    switchPanel(t.backend || 'edge');
+  }
+
+  function collectTts() {
+    const payload = { backend: $('f-backend').value };
+    const timeout = parseInt($('f-tts-timeout').value, 10);
+    if (Number.isInteger(timeout) && timeout >= 5 && timeout <= 120) payload.timeout = timeout;
+    const put = (key, id) => {
+      const el = $(id);
+      if (el && el.value.trim()) payload[key] = el.value.trim();
+    };
+    put('edge_voice', 'f-edge-voice');
+    put('edge_rate', 'f-edge-rate');
+    put('openai_url', 'f-openai-url');
+    put('openai_key', 'f-openai-key');
+    put('openai_model', 'f-openai-model');
+    put('openai_voice', 'f-openai-voice');
+    put('minimax_url', 'f-minimax-url');
+    put('minimax_key', 'f-minimax-key');
+    put('minimax_group_id', 'f-minimax-group');
+    put('minimax_model', 'f-minimax-model');
+    put('minimax_voice', 'f-minimax-voice');
+    put('doubao_url', 'f-doubao-url');
+    put('doubao_token', 'f-doubao-token');
+    put('doubao_voice', 'f-doubao-voice');
+    put('doubao_resource_id', 'f-doubao-resource');
+    return payload;
+  }
+
+  function clearSecrets() {
+    ['f-openai-key', 'f-minimax-key', 'f-doubao-token'].forEach((id) => {
+      const el = $(id);
+      if (el) el.value = '';
+    });
+  }
+
+  function applyPreset(name) {
+    const p = TTS_PRESETS[name];
+    if (!p) return;
+    $('f-backend').value = p.backend;
+    if (p.backend === 'openai') {
+      if (!$('f-openai-url').value.trim()) $('f-openai-url').value = p.url;
+      if (!$('f-openai-model').value.trim()) $('f-openai-model').value = p.model;
+      if (!$('f-openai-voice').value.trim()) $('f-openai-voice').value = p.voice;
+    } else if (p.backend === 'minimax') {
+      if (!$('f-minimax-url').value.trim()) $('f-minimax-url').value = p.url;
+      if (!$('f-minimax-model').value.trim()) $('f-minimax-model').value = p.model;
+      if (!$('f-minimax-voice').value.trim()) $('f-minimax-voice').value = p.voice;
+    } else if (p.backend === 'doubao') {
+      if (!$('f-doubao-url').value.trim()) $('f-doubao-url').value = p.url;
+      if (!$('f-doubao-voice').value.trim()) $('f-doubao-voice').value = p.voice;
+      if (!$('f-doubao-resource').value.trim()) $('f-doubao-resource').value = p.resource;
+    }
+    switchPanel(p.backend);
+    show('info', '已切到 ' + TTS_NAMES[p.backend] + '，填好密钥后点「保存语音配置」，再点「试听一句」。');
+  }
+
+  async function saveTts(btn) {
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '保存中…';
+    try {
+      const res = await action('save_tts', collectTts());
+      clearSecrets();
+      const name = TTS_NAMES[(res && res.backend) || 'edge'] || (res && res.backend);
+      show('good', '语音配置已保存，当前使用 <b>' + name + '</b>。点「试听一句」确认效果。');
+      await refresh();
+    } catch (err) {
+      show('bad', '保存失败：' + errText(err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  }
+
+  async function previewTts(btn) {
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '合成中…';
+    show('info', '正在合成试听音频…');
+    const audio = $('wc-audio');
+    try {
+      // 先保存再试听：后端读的是 config.toml，页面上刚填的密钥还没落到文件里。
+      await action('save_tts', collectTts());
+      clearSecrets();
+      const res = await action('tts_preview', { backend: $('f-backend').value });
+      if (!res || !res.ok) {
+        show('bad', '试听失败：' + esc((res && res.error) || '未知原因'));
+        return;
+      }
+      audio.src = res.audio;
+      audio.classList.add('show');
+      const played = audio.play();
+      if (played && played.catch) played.catch(() => {});
+      show('good', '试听已生成（' + res.elapsed + ' 秒 / ' + Math.round(res.bytes / 1024) + 'KB），就是接线后手机里听到的效果。');
+      $('tts-last').textContent = '上次试听：成功 ' + res.elapsed + 's';
+      await refresh();
+    } catch (err) {
+      show('bad', '试听失败：' + errText(err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  }
+
+  async function save(btn) {
+    // collect() 会校验通话时长/重拨次数，抛错时必须让用户看见——
+    // 之前这行在 try 外面，任何校验失败都变成「点了没反应」。
+    let payload;
+    try {
+      payload = collect();
+    } catch (err) {
+      show('bad', errText(err));
+      return;
+    }
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '保存中…';
+    try {
+      const res = await action('save', payload);
+      $('f-pass').value = '';
+      show('good', '已保存。下次拨打：<code>' + (res && res.next_at ? res.next_at.replace('T', ' ') : '—') + '</code>');
+      await refresh();
+    } catch (err) {
+      show('bad', '保存失败：' + errText(err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  }
+
+  // 全局试拨：不依赖任务，专门用来排查链路（拨号 / 声音 / 音量）。
+  // 不勾「用任务提示词」时拨固定台词，不花模型钱，也不写进任务记录。
+  async function testCall(btn) {
+    const useModel = $('f-usemodel').checked;
+    const ring = parseInt($('f-ring').value, 10);
+    const ringSeconds = Number.isInteger(ring) ? Math.min(120, Math.max(10, ring)) : 30;
+    const job = JOBS[0] || null;
+    if (useModel && !job) {
+      show('bad', '现在还没有任务，勾掉「试拨时用任务的提示词」再拨就行。');
+      return;
+    }
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '拨打中…';
+    show('info', useModel
+      ? '正在按任务「' + esc(job.label || job.id) + '」的提示词生成台词并拨号，手机大概会响 ' + ringSeconds + ' 秒…'
+      : '正在拨固定测试台词，手机大概会响 ' + ringSeconds + ' 秒，接起来能听到声音才算通…');
+    try {
+      if (useModel) {
+        // 先把编辑中的提示词落盘，否则听到的还是上次保存的那版。
+        try {
+          await action('save_jobs', { payload: JSON.stringify(collectJobs()) });
+        } catch (ignored) {
+          /* 落盘失败也照拨，用已保存的提示词 */
+        }
+      }
+      const res = await action('test_call', {
+        use_model: useModel,
+        ring_seconds: ringSeconds,
+        job_id: useModel ? (job.id || '') : ''
+      });
+      if (res && res.ok) {
+        show('good', '拨通了' + (res.text ? '：<b>' + esc(res.text) + '</b>' : '')
+          + '。手机没响或没声音，就核对被叫号、以及手机上是不是登录着同一个账号。' + logTip(res));
+      } else {
+        show('bad', '没接通：' + esc((res && res.error) || '未知原因')
+          + ((res && res.hint) ? '<br>' + esc(res.hint) : '') + logTip(res));
+      }
+      await refresh();
+    } catch (err) {
+      show('bad', '试拨失败：' + errText(err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  }
+
+  async function resetState(btn) {
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '清理中…';
+    try {
+      await action('reset_state', {});
+      show('good', '今日记录已清空，所有任务今天都还能再拨一次。');
+      await refresh();
+    } catch (err) {
+      show('bad', '清空失败：' + errText(err));
+    } finally {
+      btn.disabled = false;
+      btn.textContent = label;
+    }
+  }
+
+  $('wc-test').addEventListener('click', (e) => testCall(e.currentTarget));
+  $('wc-save').addEventListener('click', (e) => save(e.currentTarget));
+  $('wc-reset').addEventListener('click', (e) => resetState(e.currentTarget));
+  // 页面不做轮询，「刷新」是唯一的手动同步入口，之前忘了绑事件，点了完全没反应。
+  $('wc-refresh').addEventListener('click', async (e) => {
+    const btn = e.currentTarget;
+    const label = btn.textContent;
+    btn.disabled = true;
+    btn.textContent = '刷新中…';
+    await refresh();
+    btn.disabled = false;
+    btn.textContent = label;
+  });
+  // 切回这个标签页时顺手同步一次，省得看到过期状态。
+  document.addEventListener('visibilitychange', () => {
+    if (!document.hidden) refresh();
+  });
+  $('wc-save-persona').addEventListener('click', (e) => savePersona(e.currentTarget));
+  $('wc-import-persona').addEventListener('click', (e) => importPersona(e.currentTarget));
+  $('wc-restore-persona').addEventListener('click', (e) => restorePersona(e.currentTarget));
+  $('wc-show-effective').addEventListener('click', (e) => toggleEffective(e.currentTarget));
+  $('wc-goto-persona').addEventListener('click', gotoPersona);
+  $('f-persona').addEventListener('input', paintPersona);
+  $('f-persona-first').addEventListener('change', () => {
+    PERSONA.first_paragraph_only = $('f-persona-first').checked;
+    paintPersona();
+  });
+  document.querySelectorAll('[data-pmode]').forEach((btn) => {
+    btn.addEventListener('click', () => {
+      PERSONA.source = btn.dataset.pmode;
+      paintPersona();
+      show('info', PERSONA.source === 'custom'
+        ? '已切到「<b>插件内人设</b>」，点「保存人设」后才生效。之后改 MaiBot 设置不会影响这里。'
+        : '已切到「<b>跟随 MaiBot 设置</b>」，点「保存人设」后每次现读设置里的人设。');
+    });
+  });
+  $('wc-save-tts').addEventListener('click', (e) => saveTts(e.currentTarget));
+  $('wc-save-guard').addEventListener('click', (e) => saveGuard(e.currentTarget));
+  $('wc-fill-ban').addEventListener('click', () => {
+    $('f-guard-ban').value = GUARD.ban_words_default || '';
+    show('info', '已把内置词表填进输入框，可以直接删改；改完点「保存守门设置」才生效。');
+  });
+  $('wc-clear-ban').addEventListener('click', () => {
+    $('f-guard-ban').value = '';
+    show('info', '已清空，保存后会回到内置默认词表。');
+  });
+  $('wc-fill-pool').addEventListener('click', () => {
+    $('f-guard-pool').value = GUARD.fallback_default || '';
+    show('info', '已把内置备用台词填进输入框，可以直接改；改完点「保存守门设置」。');
+  });
+  $('f-lan-subnet').addEventListener('change', () => {
+    // 只是视觉联动，真正生效靠点保存。
+    $('lan-subnet-row').style.display = $('f-lan-subnet').checked ? '' : 'none';
+  });
+  $('f-guard').addEventListener('change', () => {
+    const on = $('f-guard').checked;
+    // 只是视觉联动，真正生效靠点保存；免得以为勾一下就已经开了。
+    ['f-guard-chars', 'f-guard-ban', 'f-guard-pool'].forEach((id) => { $(id).disabled = !on; });
+    ['wc-fill-ban', 'wc-clear-ban', 'wc-fill-pool'].forEach((id) => { $(id).disabled = !on; });
+    show('info', on ? '守门要开——点「保存守门设置」后才生效。' : '守门要关——点「保存守门设置」后才生效。');
+  });
+  $('wc-preview').addEventListener('click', (e) => previewTts(e.currentTarget));
+  $('f-backend').addEventListener('change', () => switchPanel($('f-backend').value));
+  document.querySelectorAll('[data-preset]').forEach((btn) => {
+    btn.addEventListener('click', () => applyPreset(btn.dataset.preset));
+  });
+  switchPanel($('f-backend').value);
+  paintPersona();
+
+  if (window.maibot && window.maibot.ready) {
+    window.maibot.ready.then(() => refresh());
+  }
+})();
+</script>
