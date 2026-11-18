@@ -43,6 +43,9 @@
 ├── webui/
 │   └── wake.html         侧边栏页面（纯静态，无构建步骤）
 ├── config.example.toml   配置示例（对照用，真实配置由插件自动生成）
+├── assets/
+│   ├── icon.png          插件图标（512×512，manifest 指向这个）
+│   └── icon.svg          图标源文件，改完重新导出一份 png
 ├── README.md
 ├── LICENSE               MIT
 └── .gitignore            屏蔽 config.toml / state.json / data/
