@@ -20,6 +20,14 @@
 
 ## 安装
 
+**拿到代码**，两种都行：
+
+- **下载发布包（推荐）**：[最新 Release](https://github.com/mamaipiye/maibot-wake-call/releases/latest)
+  里的 `maibot-wake-call-v1.0.0.zip`，解压后就是一个现成的插件目录。
+- **克隆仓库**：`git clone https://github.com/mamaipiye/maibot-wake-call.git`
+
+然后：
+
 1. 在 `MaiBot/bots/<bot_id>/plugins/` 下建一个目录（例如 `local_wake_call`），
    把本仓库的文件平铺进去——`_manifest.json` 必须直接在 `local_wake_call/` 里，
    不要再多套一层。
