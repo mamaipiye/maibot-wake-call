@@ -206,7 +206,7 @@
   <div class="wc-head">
     <div>
       <h2 class="wc-title">麦麦电话闹钟</h2>
-      <p class="wc-sub">到点打一通 SIP 电话到你手机，接起来就是她说话。可以放多个任务，各自定时、各自写提示词。</p>
+      <p class="wc-sub">到点打一通 SIP 电话到你手机，接起来就是她说话——<b>单向的，播完就挂，你说话她听不见</b>。可以放多个任务，各自定时、各自写提示词。</p>
     </div>
     <div class="wc-actions">
       <button class="wc-btn" id="wc-fold-all" type="button">全部展开</button>
@@ -546,6 +546,10 @@
     <p class="wc-note">
       每个任务卡片上的「试拨」会真的拨出去，手机响 30 秒，接起来能听到声音才算通。
       拨号用的是 baresip，走 UDP 5060，不需要梯子。
+    </p>
+    <p class="wc-note">
+      <b>单向播放：</b>接通后是从你这头往手机那头播一句话，播完插件主动挂断。
+      手机端说话不会被采集、也不会传回来——这里没有麦克风通路，所以不能当对讲机用。
     </p>
   </div>
 </div>
