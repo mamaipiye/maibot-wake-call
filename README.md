@@ -29,8 +29,10 @@
    用 sip2sip 这类服务。
 2. **Linphone 里把 PCMA 关掉**（设置 → 音频 → 编解码器，只留 PCMU）。不关的典型症状是
    「接通了，但一句都听不到」。
-3. **ffmpeg 和 baresip 要单独装**，Debian / Ubuntu / proot 一条命令：
-   `apt install -y baresip baresip-modules ffmpeg`。缺 ffmpeg 的表现同样是「接通但没声音」。
+3. **ffmpeg、baresip 和 edge-tts 要单独装**。Debian / Ubuntu / proot 两行命令：
+   `apt install -y baresip baresip-modules ffmpeg`，再用 MaiBot 那个 Python 补一个包
+   `/opt/MaiBot/.venv/bin/pip install edge-tts`。
+   缺 ffmpeg 是「接通但没声音」，缺 edge-tts 是根本合不出语音。
    macOS / Windows 的装法见「运行前置」一节。
 
 ## 它是单向的：只能听，不能对话
@@ -196,17 +198,42 @@ SIP 方案只有三环，中间那台服务器还可以换成自己搭的。
 > 闹钟场景正好丢掉开头那句——这就是本插件把「内网直呼」做成默认开启的原因。
 > 手机和 MaiBot 在同一张 WiFi 上时它会自动绕开服务器，见下节。
 
-## 运行前置（两个外部程序，缺一不可）
+## 运行前置（两个外部程序 + 一个 Python 包）
 
-插件本身是单文件 Python，但有两件事 Python 做不到，必须调用系统里的独立程序：
+插件本身是单文件 Python，但有两件事 Python 做不到，必须调用系统里的独立程序；
+另外默认的语音后端要额外装一个包。
 
 | 依赖 | 干什么 | 缺了会怎样 |
 |---|---|---|
 | `baresip` + `stdio / aufile / g711 / account / menu` 模块 | 真正发起 SIP 呼叫、播放音频 | 拨不出去，日志报「找不到 baresip」 |
 | `ffmpeg` | 把 TTS 音频转成电话能播的 8k 单声道 WAV | **电话能接通，但一句都听不到** |
+| `edge-tts`（Python 包） | 默认的后端，把台词合成 mp3 | 试拨和正式拨号都失败，日志报 `edge-tts 失败`；换 OpenAI / MiniMax / 豆包后端可绕开 |
 
 **它们不会跟插件一起下载。** 插件的 zip 只有几百 KB，而 ffmpeg 单独就有几十 MB；
 更重要的是各平台的二进制互不通用，打包进来反而会在别的系统上跑不起来。所以走系统包管理器装。
+
+### edge-tts 要装进 MaiBot 那个 Python
+
+插件调用的是 `sys.executable -m edge_tts`——也就是**跑着 MaiBot 的那个解释器**，不是系统 `python`。
+所以要用 MaiBot 虚拟环境里的 pip：
+
+```bash
+# 按你实际的安装路径改；下面是常见位置
+/opt/MaiBot/.venv/bin/pip install edge-tts
+# 或：cd /opt/MaiBot && .venv/bin/pip install edge-tts
+```
+
+装完可以验一下，能打出帮助信息就算成了：
+
+```bash
+/opt/MaiBot/.venv/bin/python -m edge_tts --help
+```
+
+不想动 venv 也可以：在插件目录下建一个 `vendor/`，把 `edge_tts` 包的内容放进去，
+插件启动合成时会自动把 `vendor/` 加进 `PYTHONPATH`。
+
+> 用的是微软公开的朗读接口，不需要 API key，也不需要梯子。
+> 如果环境完全连不上外网，就把 TTS 后端换成 OpenAI 兼容 / MiniMax / 豆包。
 
 ### ffmpeg 是干什么的（为什么绕不过去）
 
@@ -232,9 +259,12 @@ Windows 手动装 zip 的要注意：解压后把里面的 `bin` 目录加进系
 
 ### 装完怎么确认
 
-插件启动时会自检这两个程序，缺哪个就在侧栏「环境自检」直接显示
+插件启动时会自检 `baresip` 和 `ffmpeg`，缺哪个就在侧栏「环境自检」直接显示
 **「baresip 缺失」** 或 **「ffmpeg 缺失」**，日志里也会打一条带安装命令的 warning。
 不用等到闹钟响才发现。
+
+`edge-tts` 是 Python 包，不在这个自检范围内——缺了要到第一次合成才暴露，日志里是
+`edge-tts 失败: No module named edge_tts`。用上面那条 `--help` 命令提前验一下最省事。
 
 ## 账号准备（插件侧）
 
@@ -257,7 +287,7 @@ server = "proxy.sipthor.net"     # sip2sip 必填；自建 PBX 填 PBX 地址
 callee_aor = "sip:你的被叫@sip2sip.info"
 
 [tts]
-backend = "edge"                 # 免费、免密钥，装好就能用
+backend = "edge"                 # 免费、免密钥；前提是装过 edge-tts 包（见「运行前置」）
 ```
 
 其余项保持默认即可。想换音色 / 换后端、改台词人设、改台词守门，都在侧边栏里点。
