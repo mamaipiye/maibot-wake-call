@@ -833,6 +833,9 @@ class WakeCallPlugin(MaiBotPlugin):
             jstate["last_fired_at"] = now.isoformat(timespec="seconds")
             jstate.pop("attempts", None)
             jstate.pop("skipped_date", None)
+            # 成功必须覆盖上一次的失败记录，否则侧边栏会永远停在历史错误上
+            jstate["last_result"] = "拨出成功"
+            jstate.pop("last_error", None)
             self._save_state()
             self.ctx.logger.info(
                 "任务「%s」已拨出: %s", job.label or job.id, now.isoformat(timespec="seconds")
