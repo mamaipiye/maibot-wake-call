@@ -1,4 +1,4 @@
-# 麦麦电话闹钟（local.wake-call）v1.0.0
+# 麦麦电话闹钟（local.wake-call）v1.0.2
 
 到点给手机打一通真的电话：MaiBot 用模型生成一句话，做语音合成，经 SIP 拨到你手机上，
 手机出现原生来电界面，接起来就是那句话。不依赖 QQ，也不需要 root 或安卓系统权限。
@@ -112,7 +112,7 @@ SIP 走的是系统通话通道——全屏亮起、持续振铃、可以设成�
 **拿到代码**，两种都行：
 
 - **下载发布包（推荐）**：[最新 Release](https://github.com/mamaipiye/maibot-wake-call/releases/latest)
-  里的 `maibot-wake-call-v1.0.0.zip`，解压后就是一个现成的插件目录。
+  里的 `maibot-wake-call-v1.0.2.zip`，解压后就是一个现成的插件目录。
 - **克隆仓库**：`git clone https://github.com/mamaipiye/maibot-wake-call.git`
 
 然后：

@@ -1,7 +1,7 @@
 {
   "manifest_version": 2,
   "id": "local.wake-call",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "plugin_type": "automation",
   "name": "麦麦电话闹钟",
   "description": "到点给你的手机打一通真的电话：模型按提示词生成一句话，TTS 合成后由 baresip 发起 SIP 呼叫，手机弹出原生来电界面，不依赖 QQ 通道，QQ 掉线也不会错过。只单向播放，不能对话，台词播完自动挂断。五分钟能跑通：注册一个 sip2sip 账号 → 手机装 Linphone → 填两项配置。支持多个定时任务（各自时间与提示词）、四家 TTS（edge / OpenAI 兼容 / MiniMax / 豆包，某家失败自动退回 edge）、台词守门与字数硬限制、内网直呼分层发现（对方换 IP 也能找回，公共网络自动收敛扫描），也可部署到公网云服务器走自建 SIP。",
